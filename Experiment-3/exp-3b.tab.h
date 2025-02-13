@@ -40,8 +40,8 @@
       know about them.  */
    enum yytokentype {
      NUMBER = 258,
-     POW = 259,
-     EXP = 260
+     SQRT = 259,
+     CQRT = 260
    };
 #endif
 
@@ -54,7 +54,7 @@ typedef union YYSTYPE
 /* Line 1676 of yacc.c  */
 #line 11 "exp-3b.y"
 
-    double val;
+    int num; // For numbers
 
 
 

@@ -3,43 +3,37 @@
 #include <stdlib.h>
 #include <math.h>
 
+extern int yylex(void);  // Declare the lexical analyzer function
+
 void yyerror(const char *s);
-int yylex();
 %}
 
-/* Define a union to store numerical values */
 %union {
-    double val;
+    int num; // For numbers
 }
 
-/* Declare token data types */
-%token <val> NUMBER
-%token POW EXP
-
-/* Declare expression return type */
-%type <val> expr
-
+%token <num> NUMBER
+%token SQRT CQRT
 %left '+' '-'
 %left '*' '/'
-%right POW
+%right SQRT CQRT
+
+%type <num> calculation expression
 
 %%
 
-input: /* empty */
-     | input line
-     ;
-
-line: '\n'
-    | expr '\n' { printf("Result: %lf\n", $1); fflush(stdout); }
+calculation:
+    expression { printf("Result: %d\n", $1); }
     ;
 
-expr: NUMBER { $$ = $1; }
-    | expr '+' expr { $$ = $1 + $3; }
-    | expr '-' expr { $$ = $1 - $3; }
-    | expr '*' expr { $$ = $1 * $3; }
-    | expr '/' expr { if ($3 != 0) $$ = $1 / $3; else { yyerror("Division by zero"); $$ = 0; } }
-    | expr POW expr { $$ = pow($1, $3); }
-    | EXP '(' expr ')' { $$ = exp($3); }
+expression:
+      NUMBER               { $$ = $1; }
+    | expression '+' expression  { $$ = $1 + $3; }
+    | expression '-' expression  { $$ = $1 - $3; }
+    | expression '*' expression  { $$ = $1 * $3; }
+    | expression '/' expression  { $$ = $1 / $3; }
+    | SQRT expression       { $$ = sqrt($2); }
+    | CQRT expression       { $$ = cbrt($2); }
     ;
 
 %%
@@ -49,6 +43,10 @@ void yyerror(const char *s) {
 }
 
 int main() {
-    printf("Enter expressions (Ctrl+D to exit):\n");
-    return yyparse();
+    printf("Simple Calculator. Type 'exit' to quit.\n");
+    while (1) {
+        printf("> ");
+        yyparse();  // Parse the input
+    }
+    return 0;
 }
